@@ -1,51 +1,84 @@
+import ProductService from "../services/ProductService";
+
+const calculateSubtotal = (products) => {
+  let subtotal = products.reduce((subtotal, product) => {
+    return subtotal + Number.parseInt(product.quantity) * Number.parseFloat(product.price);
+  }, 0);
+
+  return Number.parseFloat(subtotal).toFixed(2);
+};
+
 export const initialCartState = {
   data: { products: [], quantity: 0 }
 };
 
-function calculateSubtotal(products) {
-  let subtotal = 0;
-  
-  for (let product of products) {
-    subtotal += Number.parseInt(product.quantity) * Number.parseFloat(product.price);
-  }
-
-  return Number.parseFloat(subtotal).toFixed(2);
-}
-
 export const cartReducer = (state, action) => {
-  debugger
+  let product = null;
+
+  debugger;
+
   switch (action.type) {
+    case 'ADD_SEARCH':
+      console.log("ADD_SEARCH", state, action);
+
+      return {
+        data: {
+          products: ProductService.getProducts(action.data.search)
+        }
+      }
+
     case 'ADD_PRODUCT_TO_CART':
-      let products;
-      let product = state.data.products.filter(element => action.data.product.id === element.id);
+      console.log("ADD_PRODUCT_TO_CART", state, action);
+      product = state.data.products.filter(element => action.data.product.id === element.id);
 
       state.data.quantity++;
 
-      // si el producto no existe en el carrito, lo agrego con cantidad 1
+      // product does not exists in cart, add it with quantity = 1
       if (product.length === 0) {
         action.data.product.quantity = 1;
-        products = state.data.products.concat({ ...action.data.product });
+        state.data.products = state.data.products.concat({ ...action.data.product });
       } else {
         state.data.products.forEach(element => {
           if (element.id === product[0].id) {
             element.quantity++;
           }
         });
-        products = state.data.products;
       }
 
       return {
         data: {
-          products: products,
+          products: state.data.products,
           quantity: state.data.quantity,
-          subtotal: calculateSubtotal(products)
+          subtotal: calculateSubtotal(state.data.products)
         }
       }
 
     case 'REMOVE_PRODUCT_FROM_CART':
-      console.log("REMOVE_PRODUCT_FROM_CART", action.data.product);
+      console.log("REMOVE_PRODUCT_FROM_CART", state, action);
+      product = state.data.products.filter(element => action.data.product.id === element.id);
+
+      state.data.quantity--;
+
+      // product exists in cart
+      if (product.length !== 0) {
+        state.data.products.forEach((element, index, object) => {
+          if (element.id === product[0].id) {
+            element.quantity--;
+            if (element.quantity === 0)
+              object.splice(index, 1);
+          }
+        });
+      }
+
+      return {
+        data: {
+          products: state.data.products,
+          quantity: state.data.quantity,
+          subtotal: calculateSubtotal(state.data.products)
+        }
+      }
 
     default:
-      return state;
+      return [];
   }
 };

@@ -66,3 +66,9 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `npm run build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+# TODO
+
+* Search in AppBar for product.name, product.brand, product.category.name
+* Add view with prices progression charts
+* Use google lens for scan product and use it for buying

@@ -16,6 +16,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
+import CartContext from '../context/CartContext';
 
 const useStyles = makeStyles(theme => ({
   grow: {
@@ -83,6 +84,7 @@ export default function Header() {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const [state, dispatch] = React.useContext(CartContext);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -107,11 +109,15 @@ export default function Header() {
     handleMobileMenuClose();
   };
 
-  const handleMobileMenuOpen = event => {
+  const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
-  const menuId = 'primary-search-account-menu';
+  const handleSearchInput = (event) => {
+    debugger;
+    const value = event.target.value;
+    dispatch({ type: 'ADD_SEARCH', data: { value } });
+  };
 
   return (
     <div className={classes.grow}>
@@ -125,9 +131,6 @@ export default function Header() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography className={classes.title} variant="h6" noWrap>
-            Material-UI
-          </Typography>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />
@@ -139,11 +142,12 @@ export default function Header() {
                 input: classes.inputInput,
               }}
               inputProps={{ 'aria-label': 'search' }}
+              onChange={handleSearchInput}
             />
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <Modal />
+            <Modal value={{data: []}} />
             <IconButton aria-label="show 4 new mails" color="inherit">
               <Badge badgeContent={4} color="secondary">
                 <MailIcon />
@@ -157,7 +161,7 @@ export default function Header() {
             <IconButton
               edge="end"
               aria-label="account of current user"
-              aria-controls={menuId}
+              aria-controls='primary-search-account-menu'
               aria-haspopup="true"
               onClick={handleProfileMenuOpen}
               color="inherit"

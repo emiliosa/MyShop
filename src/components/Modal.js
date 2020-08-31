@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -17,10 +17,8 @@ import Slide from '@material-ui/core/Slide';
 import ShoppingCart from '@material-ui/icons/ShoppingCart';
 import { render } from 'react-dom';
 import Badge from '@material-ui/core/Badge';
-
-// Import Context
-import { AppContext } from './App';
 import { Table, TableBody, TableRow, TableHead, TableCell, TextField, TableFooter } from '@material-ui/core';
+import CartContext from '../context/CartContext';
 
 function usePersistedState(key, defaultValue) {
   const [state, setState] = React.useState(
@@ -50,9 +48,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function FullScreenDialog(props) {
-  const { state, dispatch } = useContext(AppContext);
+export default function Modal(props) {
   const classes = useStyles();
+  const [state, dispatch] = useContext(CartContext);
   const [open, setOpen] = React.useState(false);
   const [quantity, setQuantity] = React.useState(true);
   const [products, setProducts] = React.useState(() => (state.data.products));
@@ -66,7 +64,6 @@ export default function FullScreenDialog(props) {
   };
 
   const handleQuantity = (e) => {
-    debugger
     setQuantity({[e.target.name]: e.target.value});
   }
 
@@ -74,13 +71,11 @@ export default function FullScreenDialog(props) {
     return '$ ' + Number.parseFloat(Number.parseFloat(price) * Number.parseInt(quantity)).toFixed(2);
   }
 
-  const handleRemoveProductFromCart = (id) => {
-    debugger
-    //dispatch({ type: 'REMOVE_PRODUCT_FROM_CART', data: { product } });
+  const handleRemoveProductFromCart = (product) => {
+    dispatch({ type: 'REMOVE_PRODUCT_FROM_CART', data: { product } });
   }
 
   const handleUsePersistedState = () => {
-    debugger
     console.log(this.usePersistedState)
   }
 
@@ -104,18 +99,18 @@ export default function FullScreenDialog(props) {
           <TableBody>
             {state.data.products.map(product => 
               <TableRow key={product.id}>
-                <TableCell><img style={{width: "20%"}} src={product.image} /></TableCell>
-                <TableCell>{product.name} ({product.brand.name})</TableCell>
-                <TableCell>Cantidad: {product.quantity}</TableCell>
+                <TableCell align="left"><img style={{width: "20%"}} src={product.image} /></TableCell>
+                <TableCell align="center">{product.name} ({product.brand.name})</TableCell>
+                <TableCell align="center">Cantidad: {product.quantity}</TableCell>
                   {/* <TextField 
                     type="number" 
                     InputProps={{ name: `quantity-product-id-${product.id}`, inputMode: "numeric" }} 
                     value={quantity}
                     onChange={(e) => handleQuantity(e) }
                   /> */}
-                <TableCell><>{handleProductPrice(product.quantity, product.price)}</></TableCell>
-                <TableCell>
-                  <IconButton edge="start" color="inherit" onClick={() => handleRemoveProductFromCart(product.id)} >
+                <TableCell align="right"><>{handleProductPrice(product.quantity, product.price)}</></TableCell>
+                <TableCell align="right">
+                  <IconButton edge="start" color="inherit" onClick={() => handleRemoveProductFromCart(product)} >
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>
@@ -130,7 +125,8 @@ export default function FullScreenDialog(props) {
                 <TableCell></TableCell>
                 <TableCell></TableCell>
                 <TableCell></TableCell>
-                <TableCell>$ {state.data.subtotal}</TableCell>
+                <TableCell align="right">Subtotal $ {state.data.subtotal}</TableCell>
+                <TableCell></TableCell>
               </TableRow>
             </TableBody>
           </Table>

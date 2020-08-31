@@ -3,9 +3,7 @@ import React, { useContext } from "react";
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import { makeStyles } from '@material-ui/core/styles';
-
-// Import Context
-import { AppContext } from '../App';
+import CartContext from '../../context/CartContext';
 
 const useStyles = makeStyles(theme => ({
   product: {
@@ -46,7 +44,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function Product(props) {
   const classes = useStyles();
-  const { state, dispatch } = useContext(AppContext);
+  const [ state, dispatch ] = useContext(CartContext);
 
 
   const addProductToCart = (product) => {
